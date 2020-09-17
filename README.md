@@ -13,13 +13,11 @@ Chapter 05:
 
 Chapter 06:
 - image transformations (flipping/reflecting horizontally)
-
-Chapter 07:
--N/A
-
-Chapter 08:
+- masking (creating masks for two images when overlaying them on top of each other)
+- bitwise operations (combining two masked images to create the overlayed/combined image)
 
 Chapter 09:
+- simple thresholding (used to create a mask while overlaying images)
 
 Chapter 10:
 

@@ -2,20 +2,16 @@
 import numpy as np
 import cv2
 
-def flipHorizontally(image):
-# function to flip/reflect an image horizontally
-
-    return cv2.flip(image, 1)
-
 def overlay(background, overlay):
 # function to "overlay" an image onto another image using masks
 # NOTE: IMAGES MUST BE THE SAME SIZE!!!
 
     # choose region to put the overlay image, roi = region of interest
     rows,cols,channels = overlay.shape
-    roi = background[0:rows, 0:cols ]
+    roi = background[0:rows, 0:cols]
 
-    # create an inverse mask for the overlay
+    # create an inverse mask for the overlay, use thresholding to 'black out'
+    # parts of the image that are white (the background)
     overlaygray = cv2.cvtColor(overlay,cv2.COLOR_BGR2GRAY)
     ret, mask = cv2.threshold(overlaygray, 250, 255, cv2.THRESH_BINARY_INV)
     mask_inv = cv2.bitwise_not(mask)
@@ -26,16 +22,10 @@ def overlay(background, overlay):
     overlay_fg = cv2.bitwise_and(overlay,overlay,mask = mask)
 
     # add two images togethe using bitwise add(), black areas in both images will be filled
-    out_img = cv2.add(background_bg,overlay_fg)
-    background[0:rows, 0:cols ] = out_img
+    result = cv2.add(background_bg,overlay_fg)
+    background[0:rows, 0:cols] = result
 
-    return out_img
-
-def drawRectangle(image, color, point1, point2):
-# function to draw a rectangle
-    cv2.rectangle(image, point1, point2, color, -1)
-
-    return image
+    return result
 
 def addBorder(image, color):
 # function to add a red, green or blue border to an image
@@ -67,6 +57,14 @@ def addBorder(image, color):
 
     return image
 
+def transition(image, title, text):
+# transition function that clears the current image, displays the new image, and
+# waits for a keypress between every image change
+    cv2.destroyAllWindows()
+    cv2.imshow(title, image)
+    print(text)
+    cv2.waitKey(0)
+
 # welcome user
 print("Hello! Welcome to image editor. Today we will be editing this picture of \
 Appa the flying bison! (Press any key for the next step)")
@@ -86,49 +84,35 @@ the border to be. You may choose red, green, or blue: ").lower()
 # add border
 image = addBorder(image, borderColor)
 
-# clear original, display updated image, wait for keypress to add platform
-cv2.destroyAllWindows()
-cv2.imshow("Appa with Border", image)
-print("Nice! Now, Appa is currently flying in mid-air. Let's add a platform for \
-him to land on. (Press any key to add a platform)")
-cv2.waitKey(0)
+transition(image, "Appa with Border", "Nice! Now, Appa is currently flying in \
+mid-air. Let's add a platform for him to land on. (Press any key to add a platform)")
 
 # add platform
 platformColor = (13, 26, 40)
 point1 = (int(image.shape[1]*0.2), int(image.shape[0]*0.84))
-print(point1)
 point2 = (int(image.shape[1]*0.8), int(image.shape[0]*0.89))
-print(point2)
-image = drawRectangle(image, platformColor, point1, point2)
+image = cv2.rectangle(image, point1, point2, platformColor, -1)
 
-# clear original, display updated image, wait for keypress to add cupcake
-cv2.destroyAllWindows()
-cv2.imshow("Appa on platform", image)
-print("Awesome! (Press any key for the next step)")
-cv2.waitKey(0)
+transition(image, "Appa on a Platform", "Awesome! (Press any key for the next step)")
 
-# create a copy of both images to edit
-imageCopy = np.copy(image)
+# (using a copy of image) add cupcake
+imageWithCupcake1 = overlay(np.copy(image), cupcakeImage)
 
-# add cupcake
-imageWithCupcake = overlay(imageCopy, cupcakeImage)
+transition(imageWithCupcake1, "A Cupcake!", "Look, a cupcake! Appa is hungry and \
+he wants to eat the cupcake. However, he is facing the wrong way. Let's flip him \
+so that he can eat the cupcake. (Press any key to flip Appa)")
 
-# clear original, display updated image, wait for keypress to flip image
-cv2.destroyAllWindows()
-cv2.imshow("A cupcake!", imageWithCupcake)
-print("Look, a cupcake! Appa is hungry and he wants to eat the cupcake. However, \
-he is facing the wrong way. Let's flip him so that he can eat the cupcake. \
-(Press any key to flip Appa)")
-cv2.waitKey(0)
+# (using a copy of image) flip image, add cupcake onto flipped image
+imageWithCupcake2 = overlay(cv2.flip(np.copy(image), 1), cupcakeImage)
 
-# flip image and add cupcake again
-image = overlay(flipHorizontally(image), cupcakeImage)
+transition(imageWithCupcake2, "Yum!", "Yum :)")
 
-# clear original, display updated image, wait for keypress
-cv2.destroyAllWindows()
-cv2.imshow("A cupcake!", image)
-print("Yum :)")
-cv2.waitKey(0)
+# flip original image
+image = cv2.flip(image, 1)
+
+transition(image, "Appa is Lonely :(", "Now, Appa is lonely. Let's give him some \
+friends to play with.")
+
 
 
 # Save the image -- OpenCV handles converting filetypes automatically
