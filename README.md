@@ -12,9 +12,10 @@ Chapter 05:
 - drawing shapes (drawing a rectangle)
 
 Chapter 06:
-- image transformations (flipping)
+- image transformations (flipping/reflecting horizontally)
 
 Chapter 07:
+-N/A
 
 Chapter 08:
 

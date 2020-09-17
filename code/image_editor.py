@@ -1,20 +1,40 @@
-# command line
-# python load_display_save.py --image ../images/trex.png
-
 # import packages
 import numpy as np
 import cv2
 
-def flip(image):
+def flipHorizontally(image):
+# function to flip/reflect an image horizontally
+
     return cv2.flip(image, 1)
 
-def overlay(image1, image2):
-# function to add a cupcake image to the original image
-    #280, 195
-    return image1
+def overlay(background, overlay):
+# function to "overlay" an image onto another image using masks
+# NOTE: IMAGES MUST BE THE SAME SIZE!!!
 
-def drawRectangle(image, color, point1, poin2):
+    # choose region to put the overlay image, roi = region of interest
+    rows,cols,channels = overlay.shape
+    roi = background[0:rows, 0:cols ]
+
+    # create an inverse mask for the overlay
+    overlaygray = cv2.cvtColor(overlay,cv2.COLOR_BGR2GRAY)
+    ret, mask = cv2.threshold(overlaygray, 250, 255, cv2.THRESH_BINARY_INV)
+    mask_inv = cv2.bitwise_not(mask)
+
+    # black out the area where the overlay will be on the background image
+    background_bg = cv2.bitwise_and(roi,roi,mask = mask_inv)
+    # extract overlay image region from the image (black out the background)
+    overlay_fg = cv2.bitwise_and(overlay,overlay,mask = mask)
+
+    # add two images togethe using bitwise add(), black areas in both images will be filled
+    out_img = cv2.add(background_bg,overlay_fg)
+    background[0:rows, 0:cols ] = out_img
+
+    return out_img
+
+def drawRectangle(image, color, point1, point2):
+# function to draw a rectangle
     cv2.rectangle(image, point1, point2, color, -1)
+
     return image
 
 def addBorder(image, color):
@@ -45,12 +65,15 @@ def addBorder(image, color):
         else:
             color = input("Please pick between red, green, and blue: ")
 
+    return image
+
 # welcome user
 print("Hello! Welcome to image editor. Today we will be editing this picture of \
 Appa the flying bison! (Press any key for the next step)")
 
-# load image
+# load images
 image = cv2.imread("/Users/michellewang/Desktop/IntroToCV/images/appa.png")
+cupcakeImage = cv2.imread("/Users/michellewang/Desktop/IntroToCV/images/cupcake.png")
 
 # display image, wait for keypress
 cv2.imshow("Original Appa", image)
@@ -72,30 +95,35 @@ cv2.waitKey(0)
 
 # add platform
 platformColor = (13, 26, 40)
-point1 = (95, 280)
-point2 = (395, 295)
+point1 = (int(image.shape[1]*0.2), int(image.shape[0]*0.84))
+print(point1)
+point2 = (int(image.shape[1]*0.8), int(image.shape[0]*0.89))
+print(point2)
 image = drawRectangle(image, platformColor, point1, point2)
 
-# clear original, display updated image, wait for keypress
+# clear original, display updated image, wait for keypress to add cupcake
 cv2.destroyAllWindows()
 cv2.imshow("Appa on platform", image)
 print("Awesome! (Press any key for the next step)")
 cv2.waitKey(0)
 
+# create a copy of both images to edit
+imageCopy = np.copy(image)
+
 # add cupcake
-cupcakeImage = cv2.imread("/Users/michellewang/Desktop/IntroToCV/images/cupcake.png", cv2.IMREAD_UNCHANGED)
-image = overlay(image, cupcakeImage)
+imageWithCupcake = overlay(imageCopy, cupcakeImage)
 
 # clear original, display updated image, wait for keypress to flip image
 cv2.destroyAllWindows()
-cv2.imshow("A cupcake!", image)
+cv2.imshow("A cupcake!", imageWithCupcake)
 print("Look, a cupcake! Appa is hungry and he wants to eat the cupcake. However, \
 he is facing the wrong way. Let's flip him so that he can eat the cupcake. \
 (Press any key to flip Appa)")
 cv2.waitKey(0)
 
-# flip image
-image = flip(image)
+# flip image and add cupcake again
+image = overlay(flipHorizontally(image), cupcakeImage)
+
 # clear original, display updated image, wait for keypress
 cv2.destroyAllWindows()
 cv2.imshow("A cupcake!", image)
