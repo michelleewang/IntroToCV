@@ -1,3 +1,5 @@
+(finished)
+
 Hello!
 
 Welcome to Image Editor. To run my program, activate my virtual environemnt "cv"
@@ -17,13 +19,13 @@ Chapter 06:
 - image transformations (flipping/reflecting horizontally)
 - masking (creating masks for two images when overlaying them on top of each other)
 - bitwise operations (combining two masked images to create the overlayed/combined image)
-- convert to grayscale (used when detecting canny edges)
+- convert to grayscale (used when masking and detecting canny edges)
 
 Chapter 08:
 - Gaussian blur (used to blur image to detect canny edges)
 
 Chapter 09:
-- simple thresholding (used to a mask while overlaying images)
+- simple thresholding (used to a mask while overlaying images, used to black out certain parts of images)
 
 Chapter 10:
 - Canny edge detection (finding the edges of objects)
