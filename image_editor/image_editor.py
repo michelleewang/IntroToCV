@@ -113,9 +113,13 @@ def transition(image, title, text):
 
 def main():
     # load images
-    image = cv2.imread("appa.png")
+    backgroundImage = cv2.imread("background.png")
+    appaImage = cv2.imread("appa.png")
     cupcakeImage = cv2.imread("cupcake.png")
     babyBisonImage = cv2.imread("baby_bison.png")
+
+    # (using a copy of the background) add a background to appaImage
+    image = overlay(np.copy(backgroundImage), appaImage)
 
     # welcome user, display original image
     transition(image, "Original Appa", "Hello! Welcome to image editor. Today we \
@@ -142,13 +146,14 @@ next step)")
 and he wants to eat the cupcake. However, he is facing the wrong way. Let's flip \
 him so that he can eat the cupcake. (Press any key to flip Appa)")
 
+    # flip Appa then place him on (unflipped) background again
+    image = overlay(backgroundImage, cv2.flip(appaImage, 1))
+    # redraw platform
+    image = cv2.rectangle(image, point1, point2, platformColor, -1)
     # (using a copy of image) flip image, add cupcake onto flipped image
-    imageWithCupcake2 = overlay(cv2.flip(np.copy(image), 1), cupcakeImage)
+    imageWithCupcake2 = overlay(np.copy(image), cupcakeImage)
 
-    transition(imageWithCupcake2, "Nom nom", "Yum :)")
-
-    # flip original image
-    image = cv2.flip(image, 1)
+    transition(imageWithCupcake2, "Nom nom", "Yum :) (Press any key to continue)")
 
     transition(image, "Appa is Lonely :(", "Now, Appa is lonely. Let's find him \
 some friends to play with. (Press any key to find Appa some friends)")
