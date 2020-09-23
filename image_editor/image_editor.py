@@ -10,33 +10,16 @@ def addBorder(image, color):
 
     # possible colors
     colors = ["red", "orange", "yellow", "green", "blue", "purple", "pink"]
-
-    # define GBR values of colors
-    red = (0, 0, 255)
-    orange = (0, 165, 255)
-    yellow = (0, 255, 255)
-    green = (0, 255, 0)
-    blue = (255, 0, 0)
-    purple = (255, 0, 255)
-    pink = (203,192,255)
+    # BGR values of possible colors
+    BGRcolors = [(0, 0, 255),(0, 165, 255),(0, 255, 255),(0, 255, 0),(255, 0, 0),(255, 0, 255),(203,192,255)]
 
     while True:
         # if color is valid
         if color in colors:
-            if color == "red":
-                BGRcolor = red
-            elif color == "orange":
-                BGRcolor = orange
-            elif color == "yellow":
-                BGRcolor = yellow
-            elif color == "green":
-                BGRcolor = green
-            elif color == "blue":
-                BGRcolor = blue
-            elif color == "purple":
-                BGRcolor = purple
-            else:
-                BGRcolor = pink
+            # get index of color
+            index = colors.index(color)
+            # get GBR value using index
+            BGRcolor = BGRcolors[index]
 
             # set four borders
             image[0:image.shape[0], 0:15] = BGRcolor
@@ -66,12 +49,9 @@ def canny(image):
 
     # convert image to grayscale
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # blue image using Gaussian Blur
+    # blue image using Gaussian Blur (NOT NEEDED IF NEXT STEP IS THERE)
     image = cv2.GaussianBlur(image, (5, 5), 0)
-    """Ok so this is definitely kind of cheating because I'm making all the bison
-     black so the edges within the bison aren't detected since I only want the
-     outer edge but Canny detects everything :/ any way I can fix that besides
-     cheating like this lol?"""
+    # THIS IS USED JUST FOR BISON IMAGE to get only the outer edge
     (T, thresh) = cv2.threshold(image, 250, 255, cv2.THRESH_BINARY)
     # perform Canny edge detection with two threshold values (min and max) as parameters
     canny = cv2.Canny(thresh, 30, 150)
@@ -112,6 +92,7 @@ def transition(image, title, text):
     cv2.waitKey(0)
 
 def main():
+    
     # load images
     backgroundImage = cv2.imread("background.png")
     appaImage = cv2.imread("appa.png")
